@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 )
+
+const delay = 5 * time.Second
+const numberOfChecks = 2
 
 func main() {
 	intro()
@@ -55,13 +59,24 @@ func readInput() int {
 
 func startMonitoring() {
 	fmt.Println("Monitoring...")
-	site := "https://staging-app.planne.com.br"
+	sites := []string {"https://staging-app.planne.com.br", "https://www.google.com", "https://www.youtube.com"}
 
+	for range numberOfChecks {
+		for j, site := range sites {
+			fmt.Println("Index: ", j, "\tSite: ", site)
+			siteTester(site)
+		}
+		fmt.Printf("\n")
+		time.Sleep(delay)
+	}
+}
+
+func siteTester(site string) {
 	res, _ := http.Get(site)
 
 	if res.StatusCode == 200 {
-		fmt.Printf("Site %s is up and running\n", site)
+		fmt.Println("Site: ", site, "is up and running")
 	} else {
-		fmt.Printf("Site %s is down. Status code: %d\n", site, res.StatusCode)
+		fmt.Println("Site: ", site, "is down. Status code: ", res.StatusCode)
 	}
 }
