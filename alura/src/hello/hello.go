@@ -55,7 +55,7 @@ func readInput() int {
 
 func startMonitoring() {
 	fmt.Println("Monitoring...")
-	site := "https://httpbin.org/status/200"
+	site := "https://staging-app.planne.com.br"
 
 	res, _ := http.Get(site)
 
