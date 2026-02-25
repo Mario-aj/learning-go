@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -77,11 +78,13 @@ func startMonitoring() {
 func siteTester(site string) {
 	res, _ := http.Get(site)
 
-	if res.StatusCode == 200 {
+	if res.StatusCode == http.StatusOK {
 		fmt.Println("Site: ", site, "is up and running")
 	} else {
 		fmt.Println("Site: ", site, "is down. Status code: ", res.StatusCode)
 	}
+
+	logRegister(site, res.StatusCode == http.StatusOK)
 }
 func readSitesFromFile() []string {
 	sites := make([]string, 0)
@@ -108,4 +111,16 @@ func readSitesFromFile() []string {
 	file.Close()
 
 	return sites
+}
+
+func logRegister(site string, status bool) {
+	file, err := os.OpenFile("log.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+
+	if err != nil {
+		fmt.Println("Error opening log file: ", err)
+	}
+
+	file.WriteString(time.Now().Format("02/01/2006 15:04:05") + " - " + site + " - online: " + strconv.FormatBool(status) + "\n")
+
+	file.Close()
 }
