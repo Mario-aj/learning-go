@@ -23,21 +23,21 @@ func main() {
 		command := readInput()
 
 		switch command {
-			case 1: 
-				startMonitoring()
-			case 2:
-				fmt.Println("Showing logs...")
-			case 0:
-				fmt.Println("Exiting...")
-				os.Exit(0)
-			default:
-				fmt.Println("Invalid command")
-				os.Exit(-1)
+		case 1:
+			startMonitoring()
+		case 2:
+			printLogs()
+		case 0:
+			fmt.Println("Exiting...")
+			os.Exit(0)
+		default:
+			fmt.Println("Invalid command")
+			os.Exit(-1)
 		}
 	}
 }
 
-func intro () {
+func intro() {
 	name := "Mario"
 	version := "1.0.0"
 
@@ -95,13 +95,13 @@ func readSitesFromFile() []string {
 		fmt.Println("Error reading file: ", err)
 	}
 
-	reader := bufio.NewReader(file);
+	reader := bufio.NewReader(file)
 
 	for {
 		line, err := reader.ReadString('\n')
 
 		if err == io.EOF {
-			break;
+			break
 		}
 
 		line = strings.TrimSpace(line)
@@ -123,4 +123,16 @@ func logRegister(site string, status bool) {
 	file.WriteString(time.Now().Format("02/01/2006 15:04:05") + " - " + site + " - online: " + strconv.FormatBool(status) + "\n")
 
 	file.Close()
+}
+
+func printLogs() {
+	fmt.Println("Showing logs...")
+
+	file, err := os.ReadFile("log.txt")
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(string(file))
 }
