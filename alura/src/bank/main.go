@@ -28,6 +28,20 @@ func main() {
 	messaage, value := account.deposit(1250)
 	fmt.Println(messaage)
 	fmt.Printf("Your new balance is: %.2f \n", value)
+
+	fmt.Println("_________________Transfer between accounts_______________")
+	elmarAccount := Account{
+		"Elmar Jorge",
+		528,
+		123456,
+		0,
+	}
+
+	success := account.transfer(100, &elmarAccount)
+	fmt.Println(success)
+
+	fmt.Println(account.balance)
+	fmt.Println(elmarAccount.balance)
 }
 
 func (account *Account) withdraw(value float64) string {
@@ -50,4 +64,14 @@ func (account *Account) deposit(value float64) (string, float64) {
 
 	account.balance += value
 	return "Deposit successful", account.balance
+}
+
+func (account *Account) transfer(value float64, destinityAccount *Account) bool {
+	if value > 0 && account.balance >= value {
+		account.withdraw(value)
+		destinityAccount.deposit(value)
+		return true
+	}
+
+	return false
 }
