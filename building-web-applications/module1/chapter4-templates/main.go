@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 
@@ -23,7 +24,7 @@ var database *sql.DB
 
 type Page struct {
 	Title   string
-	Content string
+	Content template.HTML
 	Date    string
 }
 
@@ -36,15 +37,13 @@ func ServePage(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, http.StatusText(404), http.StatusNotFound)
-		log.Println("Couldn't get page!")
+		log.Println("Couldn't get page!", err.Error())
 		return
 	}
 
-	html := `<html><head><title>` + page.Title +
-		`</title></head><body><h1>` + page.Title + `</h1><div>` +
-		page.Content + `</div></body></html>`
+	t, _ := template.ParseFiles("templates/blog.html")
 
-	fmt.Fprintln(w, html)
+	t.Execute(w, page)
 }
 
 func main() {
@@ -58,7 +57,7 @@ func main() {
 	database = db
 
 	routes := mux.NewRouter()
-	routes.HandleFunc("/page/{guid:[0-9a-zA\\-]+}", ServePage)
+	routes.HandleFunc("/pages/{guid:[0-9a-zA\\-]+}", ServePage)
 	http.Handle("/", routes)
 
 	log.Println("Server is running on port", Port)
