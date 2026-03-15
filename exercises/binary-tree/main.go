@@ -8,7 +8,7 @@ type Node struct {
 	right *Node
 }
 
-type BinaryTree struct {
+type BST struct {
 	root *Node
 }
 
@@ -45,23 +45,31 @@ func search(node *Node, value int) bool {
 	return true;
 }
 
+func (t *BST) Insert(value int) {
+	insert(&t.root, value)
+}
+
+func (t *BST) Search(value int) bool {
+	return search(t.root, value)
+}
+
 func main() {
-	tree := BinaryTree{}
+	tree := BST{}
 
 	fmt.Println(tree.root)
 
-	insert(&tree.root, 5)
-	insert(&tree.root, 8)
-	insert(&tree.root, 4)
-	insert(&tree.root, 7)
-	insert(&tree.root, 2)
+	tree.Insert(5)
+	tree.Insert(8)
+	tree.Insert(4)
+	tree.Insert(7)
+	tree.Insert(2)
 
 	fmt.Println(tree.root)
 	fmt.Println(tree.root.left)
 	fmt.Println(tree.root.right)
 
-	fmt.Println("Search for number 4", search(tree.root, 4))
-	fmt.Println("Search for number 0", search(tree.root, 0))
-	fmt.Println("Search for number 9", search(tree.root, 9))
-	fmt.Println("Search for number 2", search(tree.root, 2))
+	fmt.Println("Search for number 4", tree.Search(4))
+	fmt.Println("Search for number 0", tree.Search(0))
+	fmt.Println("Search for number 9", tree.Search(9))
+	fmt.Println("Search for number 2", tree.Search(2))
 }
