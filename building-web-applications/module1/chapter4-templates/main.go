@@ -46,6 +46,22 @@ func ServePage(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, page)
 }
 
+func RedirIndex(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/home", http.StatusMovedPermanently)
+}
+
+func ServeIndex(w http.ResponseWriter, r *http.Request) {
+	var pages = []Page{}
+
+	pages, err := database.Query("SELECT page_title, page_content, page_date FROM pages ORDER BY ? DESC", "page_date")
+
+	if err != nil {
+		fmt.Fprintln(w, err.Error())
+	}
+
+	defer pages.Close()
+}
+
 func main() {
 	dbConn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", DBUser, DBPassword, DBHost, DBPort, DBName)
 	db, err := sql.Open("mysql", dbConn)
@@ -58,6 +74,7 @@ func main() {
 
 	routes := mux.NewRouter()
 	routes.HandleFunc("/pages/{guid:[0-9a-zA\\-]+}", ServePage)
+	routes.HandleFunc("/", RedirIndex)
 	http.Handle("/", routes)
 
 	log.Println("Server is running on port", Port)
