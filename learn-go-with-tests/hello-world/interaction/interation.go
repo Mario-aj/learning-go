@@ -1,12 +1,9 @@
 package interaction
 
-
-const repeatQuantity = 5;
-
-func Repeat(char string) string {
+func Repeat(char string, quantity int) string {
 	var repeat string 
 
-	for i:= 0; i < repeatQuantity; i++ {
+	for i:= 0; i < quantity; i++ {
 		repeat = repeat + char
 	}
 
