@@ -1,12 +1,30 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestHello(t *testing.T) {
-	result := Hello("Chris")
-	expected := "Hello, Chris"
-
-	if result != expected {
-		t.Errorf("result %q, esperado %q", result, expected)
+	verifyCorrectMessage := func(t *testing.T, result, expected string) {
+		t.Helper()
+		
+		if result != expected {
+			t.Errorf("result '%s', expected '%s'", result, expected)
+		}
 	}
+
+	t.Run("Say hello to people", func(t*testing.T){
+		result := Hello("Chris")
+		expected := "Hello, Chris"
+
+
+		verifyCorrectMessage(t, result, expected)
+	})
+
+	t.Run("Say 'Hello, world!' when a empty string will be passed", func(t *testing.T) {
+		result:=Hello((""))
+		expected := "Hello, world!"
+
+		verifyCorrectMessage(t, result, expected)
+	})
 }
