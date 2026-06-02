@@ -15,7 +15,7 @@ func TestPerimeter(t *testing.T) {
 func TestArea(t *testing.T) {
 	t.Run("rectangle", func(t *testing.T) {
 		rectangle := Rectangle{12.0, 6.0}
-		result := Area(rectangle)
+		result := rectangle.Area()
 		expected := 72.0
 
 		if result != expected {
@@ -24,8 +24,8 @@ func TestArea(t *testing.T) {
 	})
 
 	t.Run("Circles", func(t *testing.T) {
-		circle := Circle{19}
-		result := Area(circle)
+		circle := Circle{10}
+		result := circle.Area()
 		expected := 314.1592653589793
 
 		if result != expected {
