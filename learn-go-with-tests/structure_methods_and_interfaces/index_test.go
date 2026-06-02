@@ -38,19 +38,22 @@ func TestArea(t *testing.T) {
 
 func TestArea2(t *testing.T) {
 	testArea := []struct {
+		name     string
 		form     Form
 		expected float64
 	}{
-		{form: Rectangle{Width: 12, Height: 6}, expected: 72.0},
-		{form: Circle{Ray: 10}, expected: 314.1592653589793},
-		{form: Triangle{Base: 12, Height: 6}, expected: 36.0},
+		{name: "Rectangle", form: Rectangle{Width: 12, Height: 6}, expected: 72.0},
+		{name: "Circle", form: Circle{Ray: 10}, expected: 314.1592653589793},
+		{name: "Triangle", form: Triangle{Base: 12, Height: 6}, expected: 36.0},
 	}
 
 	for _, tt := range testArea {
-		result := tt.form.Area()
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.form.Area()
 
-		if result != tt.expected {
-			t.Errorf("result %.2f, expected %.2f", result, tt.expected)
-		}
+			if result != tt.expected {
+				t.Errorf("%#v result %.2f, expected %.2f", tt.form, result, tt.expected)
+			}
+		})
 	}
 }
