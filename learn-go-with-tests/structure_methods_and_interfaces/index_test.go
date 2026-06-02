@@ -35,3 +35,21 @@ func TestArea(t *testing.T) {
 		verifyArea(t, circle, 314.1592653589793)
 	})
 }
+
+func TestArea2(t *testing.T) {
+	testArea := []struct {
+		form     Form
+		expected float64
+	}{
+		{Rectangle{12, 6}, 72.0},
+		{Circle{10}, 314.1592653589793},
+	}
+
+	for _, tt := range testArea {
+		result := tt.form.Area()
+
+		if result != tt.expected {
+			t.Errorf("result %.2f, expected %.2f", result, tt.expected)
+		}
+	}
+}
