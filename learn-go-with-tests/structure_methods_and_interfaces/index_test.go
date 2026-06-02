@@ -41,8 +41,9 @@ func TestArea2(t *testing.T) {
 		form     Form
 		expected float64
 	}{
-		{Rectangle{12, 6}, 72.0},
-		{Circle{10}, 314.1592653589793},
+		{form: Rectangle{Width: 12, Height: 6}, expected: 72.0},
+		{form: Circle{Ray: 10}, expected: 314.1592653589793},
+		{form: Triangle{Base: 12, Height: 6}, expected: 36.0},
 	}
 
 	for _, tt := range testArea {
