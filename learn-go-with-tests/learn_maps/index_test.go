@@ -3,9 +3,9 @@ package main
 import "testing"
 
 func TestSearch(t *testing.T) {
-	dictionary := map[string]string{"test": "This is a test"}
+	dictionary := Dictionary{"test": "This is a test"}
 
-	result := Search(dictionary, "test")
+	result := dictionary.Search("test")
 	expected := "This is a test"
 
 	stringCompare(t, result, expected)
