@@ -20,20 +20,53 @@ func TestSearch(t *testing.T) {
 }
 
 func TestAddTerm(t *testing.T) {
-	dic := Dictionary{}
+	t.Run("new term", func(t *testing.T) {
+		dic := Dictionary{}
+		term := "test"
+		definition := "New definition added"
 
-	dic.Add("added", "New definition added")
+		err := dic.Add(term, definition)
 
-	result, err := dic.Search("added")
-	expected := "New definition added"
+		errorAssertion(t, err, nil)
+		compareDefinition(t, dic, term, definition)
+	})
 
-	if err != nil {
-		t.Fatal("It was not possible to find the added term:", err)
-	}
+	t.Run("existed term", func(t *testing.T) {
+		term := "test"
+		definition := "This is a test"
 
-	if result != expected {
-		t.Errorf("result '%s', expected '%s'", result, expected)
-	}
+		dic := Dictionary{term: definition}
+
+		err := dic.Add(term, definition)
+
+		errorAssertion(t, err, ExistedTermError)
+		compareDefinition(t, dic, term, definition)
+	})
+}
+
+func TestUpdate(t *testing.T) {
+	t.Run("exited term", func(t *testing.T) {
+		term := "test"
+		definition := "This is a test"
+		newDefinition := "New definition"
+
+		dic := Dictionary{term: definition}
+
+		err := dic.Update(term, newDefinition)
+
+		errorAssertion(t, err, nil)
+		compareDefinition(t, dic, term, newDefinition)
+	})
+
+	t.Run("new term", func(t *testing.T) {
+		term := "test"
+		definition := "This is a test"
+		dic := Dictionary{}
+
+		err := dic.Update(term, definition)
+
+		errorAssertion(t, err, nonExistedTermError)
+	})
 }
 
 func stringCompare(t *testing.T, result, expected string) {
@@ -50,5 +83,18 @@ func errorAssertion(t *testing.T, err, expected error) {
 	if err != expected {
 		t.Errorf("result '%s', expected '%s'", err, expected)
 	}
+}
 
+func compareDefinition(t *testing.T, dic Dictionary, term, definition string) {
+	t.Helper()
+
+	result, err := dic.Search(term)
+
+	if err != nil {
+		t.Fatal("Should find the added term:", err)
+	}
+
+	if result != definition {
+		t.Errorf("result '%s', expected '%s'", result, definition)
+	}
 }
