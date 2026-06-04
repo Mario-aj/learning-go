@@ -53,3 +53,7 @@ func (d Dictionary) Update(term, definition string) error {
 
 	return nil
 }
+
+func (d Dictionary) Delete(term string) {
+	delete(d, term)
+}

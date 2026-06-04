@@ -69,6 +69,19 @@ func TestUpdate(t *testing.T) {
 	})
 }
 
+func TestDelete(t *testing.T) {
+	term := "test"
+	dic := Dictionary{term: "Test definition"}
+
+	dic.Delete(term)
+
+	_, err := dic.Search(term)
+
+	if err != NotFoundError {
+		t.Errorf("The term '%s' should not exist in the dictionary", term)
+	}
+}
+
 func stringCompare(t *testing.T, result, expected string) {
 	t.Helper()
 
