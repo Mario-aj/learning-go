@@ -1,10 +1,15 @@
 package main
 
-import "log"
+import (
+	"log"
+
+	_ "github.com/joho/godotenv/autoload"
+	"github.com/mario-aj/social/internal/env"
+)
 
 func main() {
 	cfg := config{
-		address: ":8080",
+		address: env.GetString("ADDR", ":8081"),
 	}
 
 	app := &application{
