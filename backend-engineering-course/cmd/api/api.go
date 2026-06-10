@@ -10,8 +10,16 @@ import (
 	"github.com/mario-aj/social/internal/store"
 )
 
+type dbConfig struct {
+	addr         string
+	maxOpenConns int
+	maxIdleConns int
+	maxIdleTime  string
+}
+
 type config struct {
 	address string
+	db      dbConfig
 }
 
 type application struct {
