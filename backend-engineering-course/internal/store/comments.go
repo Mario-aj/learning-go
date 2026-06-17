@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"database/sql"
+	"errors"
 )
 
 type Comment struct {
@@ -48,4 +49,24 @@ func (s *CommentStore) GetByPostID(ctx context.Context, postID int64) ([]Comment
 	}
 
 	return comments, nil
+}
+
+func (s *CommentStore) DeleteByPostID(ctx context.Context, postID int64) error {
+	query := `
+		DELETE FROM comments c
+		WHERE c.post_id = $1
+	`
+
+	_, err := s.db.ExecContext(ctx, query, postID)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, ErrNotFound):
+			return ErrNotFound
+		default:
+			return err
+		}
+	}
+
+	return nil
 }

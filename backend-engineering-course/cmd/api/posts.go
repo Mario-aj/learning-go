@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -50,7 +51,7 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
-	idParam := chi.URLParam(r, "postId")
+	idParam := chi.URLParam(r, "postID")
 	id, err := strconv.ParseInt(idParam, 10, 64)
 
 	if err != nil {
@@ -83,6 +84,42 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 	post.Comments = comments
 
 	if err := writeJSON(w, http.StatusOK, post); err != nil {
+		app.internalServerErrorResponse(w, r, err)
+		return
+	}
+}
+
+func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request) {
+	postIdParam := chi.URLParam(r, "postID")
+	id, err := strconv.ParseInt(postIdParam, 10, 64)
+
+	if err != nil {
+		app.internalServerErrorResponse(w, r, err)
+		return
+	}
+
+	ctx := r.Context()
+
+	err = app.store.Posts.DeleteByID(ctx, id)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, store.ErrNotFound):
+			app.notFoundErrorResponse(w, r, err)
+			return
+		default:
+			app.internalServerErrorResponse(w, r, err)
+		}
+	}
+
+	err = app.store.Comments.DeleteByPostID(ctx, id)
+
+	if err != nil {
+		app.internalServerErrorResponse(w, r, err)
+		return
+	}
+
+	if err := writeJSON(w, http.StatusOK, ""); err != nil {
 		app.internalServerErrorResponse(w, r, err)
 		return
 	}
