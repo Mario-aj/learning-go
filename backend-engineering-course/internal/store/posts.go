@@ -80,15 +80,20 @@ func (s *PostStore) DeleteByID(ctx context.Context, id int64) error {
 		WHERE id = $1
 	`
 
-	_, err := s.db.ExecContext(ctx, query, id)
+	res, err := s.db.ExecContext(ctx, query, id)
 
 	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return ErrNotFound
-		default:
-			return err
-		}
+		return err
+	}
+
+	rows, err := res.RowsAffected()
+
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return ErrNotFound
 	}
 
 	return nil

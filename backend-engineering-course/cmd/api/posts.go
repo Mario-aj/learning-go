@@ -106,10 +106,11 @@ func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request
 		switch {
 		case errors.Is(err, store.ErrNotFound):
 			app.notFoundErrorResponse(w, r, err)
-			return
 		default:
 			app.internalServerErrorResponse(w, r, err)
 		}
+
+		return
 	}
 
 	err = app.store.Comments.DeleteByPostID(ctx, id)
@@ -119,8 +120,5 @@ func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if err := writeJSON(w, http.StatusOK, ""); err != nil {
-		app.internalServerErrorResponse(w, r, err)
-		return
-	}
+	w.WriteHeader(http.StatusNoContent)
 }
