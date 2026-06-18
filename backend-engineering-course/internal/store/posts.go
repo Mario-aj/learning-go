@@ -74,7 +74,7 @@ func (s *PostStore) GetById(ctx context.Context, id int64) (*Post, error) {
 	return &post, nil
 }
 
-func (s *PostStore) DeleteByID(ctx context.Context, id int64) error {
+func (s *PostStore) Delete(ctx context.Context, id int64) error {
 	query := `
 		DELETE FROM posts 
 		WHERE id = $1
@@ -96,5 +96,9 @@ func (s *PostStore) DeleteByID(ctx context.Context, id int64) error {
 		return ErrNotFound
 	}
 
+	return nil
+}
+
+func (s *PostStore) Update(ctx context.Context, post *Post) error {
 	return nil
 }
