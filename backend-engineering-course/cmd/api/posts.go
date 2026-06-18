@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strconv"
@@ -8,6 +9,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/mario-aj/social/internal/store"
 )
+
+const postCtxKey = "post"
 
 type CreatePostPayload struct {
 	Title   string   `json:"title" validate:"required,max=100"`
@@ -51,30 +54,9 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
-	idParam := chi.URLParam(r, "postID")
-	id, err := strconv.ParseInt(idParam, 10, 64)
+	post := getPostFromCtx(r)
 
-	if err != nil {
-		app.internalServerErrorResponse(w, r, err)
-		return
-	}
-
-	ctx := r.Context()
-
-	post, err := app.store.Posts.GetById(ctx, id)
-
-	if err != nil {
-		switch err {
-		case store.ErrNotFound:
-			app.notFoundErrorResponse(w, r, err)
-			return
-		default:
-			app.internalServerErrorResponse(w, r, err)
-			return
-		}
-	}
-
-	comments, err := app.store.Comments.GetByPostID(ctx, id)
+	comments, err := app.store.Comments.GetByPostID(r.Context(), post.ID)
 
 	if err != nil {
 		app.internalServerErrorResponse(w, r, err)
@@ -100,7 +82,7 @@ func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request
 
 	ctx := r.Context()
 
-	err = app.store.Posts.DeleteByID(ctx, id)
+	err = app.store.Posts.Delete(ctx, id)
 
 	if err != nil {
 		switch {
@@ -121,4 +103,44 @@ func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (app *application) postsContextMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		idParam := chi.URLParam(r, "postID")
+		id, err := strconv.ParseInt(idParam, 10, 64)
+
+		if err != nil {
+			app.internalServerErrorResponse(w, r, err)
+			return
+		}
+
+		ctx := r.Context()
+
+		post, err := app.store.Posts.GetById(ctx, id)
+
+		if err != nil {
+			switch err {
+			case store.ErrNotFound:
+				app.notFoundErrorResponse(w, r, err)
+				return
+			default:
+				app.internalServerErrorResponse(w, r, err)
+				return
+			}
+		}
+
+		ctx = context.WithValue(ctx, postCtxKey, post)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func getPostFromCtx(r *http.Request) *store.Post {
+	post, _ := r.Context().Value(postCtxKey).(*store.Post)
+
+	return post
 }
