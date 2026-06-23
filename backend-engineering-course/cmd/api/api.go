@@ -42,7 +42,6 @@ func (app *application) mount() http.Handler {
 		r.Get("/health", app.healthCheckHandler)
 
 		// post crud
-
 		r.Route("/posts", func(r chi.Router) {
 			r.Post("/", app.createPostHandler)
 
@@ -54,6 +53,11 @@ func (app *application) mount() http.Handler {
 				r.Delete("/", app.deletePostHandler)
 				r.Post("/comment", app.createPostCommentHandler)
 			})
+		})
+
+		// User
+		r.Route("/users", func(r chi.Router) {
+			r.Get("/{userID}", app.getUserHandler)
 		})
 	})
 

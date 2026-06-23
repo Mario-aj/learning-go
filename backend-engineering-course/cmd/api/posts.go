@@ -168,7 +168,6 @@ func (app *application) createPostCommentHandler(w http.ResponseWriter, r *http.
 	if err := writeJSON(w, http.StatusCreated, comment); err != nil {
 		app.internalServerErrorResponse(w, r, err)
 	}
-
 }
 
 func (app *application) postsContextMiddleware(next http.Handler) http.Handler {
