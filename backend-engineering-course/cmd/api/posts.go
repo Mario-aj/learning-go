@@ -18,6 +18,10 @@ type CreatePostPayload struct {
 	Tags    []string `json:"tags"`
 }
 
+type CreatePostCommentPayload struct {
+	Content string `json:"content" validate:"required,max=300"`
+}
+
 func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request) {
 	var payload CreatePostPayload
 
@@ -134,6 +138,37 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 	if err := writeJSON(w, http.StatusOK, post); err != nil {
 		app.internalServerErrorResponse(w, r, err)
 	}
+}
+
+func (app *application) createPostCommentHandler(w http.ResponseWriter, r *http.Request) {
+	post := getPostFromCtx(r)
+
+	var payload CreatePostCommentPayload
+
+	if err := readJSON(w, r, &payload); err != nil {
+		app.badRequestErrorResponse(w, r, err)
+	}
+
+	if err := Validate.Struct(payload); err != nil {
+		app.badRequestErrorResponse(w, r, err)
+	}
+
+	comment := &store.Comment{
+		Content: payload.Content,
+		PostID:  post.ID,
+
+		// TODO: Change it once the auth is completed.
+		UserID: 1,
+	}
+
+	if err := app.store.Comments.Create(r.Context(), comment); err != nil {
+		app.internalServerErrorResponse(w, r, err)
+	}
+
+	if err := writeJSON(w, http.StatusCreated, comment); err != nil {
+		app.internalServerErrorResponse(w, r, err)
+	}
+
 }
 
 func (app *application) postsContextMiddleware(next http.Handler) http.Handler {
